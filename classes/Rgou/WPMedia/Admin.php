@@ -45,8 +45,8 @@ class Admin {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @param string $plugin_name The name of this plugin.
+	 * @param string $version     The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -132,7 +132,11 @@ class Admin {
 			}
 			check_admin_referer( 'wp_oil_cookie_consent_option_page_action' );
 
-			self::store( $_POST );
+			self::store(
+				array (
+
+				)
+			);
 		}
 
 		$values = get_option(
@@ -140,14 +144,40 @@ class Admin {
 			array(
 				'timestamp' => 1,
 				'links'     => array(
-					'https://google.com',
+					'https://tech.rgou.com',
 					'https:/me.rgou.net',
+					'https://blog.rgou.com',
 				),
 			)
 		);
 
 		require_once plugin_dir_path( __FILE__ ) . '../../../admin/partials/rgou-wp-media-admin-display.php';
 	}
+
+	/**
+	 * Run the Crowler
+	 *
+	 * @return void
+	 */
+	public function crowler_cron() {
+		$url     = site_url();
+		$crawler = new Crawler( $url );
+		$crawler->run();
+	}
+
+	/**
+	 * Schedule crawler to run
+	 *
+	 * @return void
+	 */
+	public function schedule_crawler() {
+		if ( wp_next_scheduled( 'rgou_wp_media_crowler_cron' ) ) {
+			$timestamp = wp_next_scheduled( 'rgou_wp_media_crowler_cron' );
+			wp_unschedule_event( $timestamp, 'rgou_wp_media_crowler_cron' );
+		}
+		wp_schedule_event( time(), 'hourly', 'rgou_wp_media_crowler_cron' );
+	}
+
 
 	/**
 	 * Store

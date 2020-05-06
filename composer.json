@@ -5,9 +5,9 @@
 	"license": "GPL-2.0+",
 	"authors": [
 		{
-			"name": "WP Media",
-			"email": "contact@wp-media.me",
-			"homepage": "https://wp-media.me"
+			"name": "Rafael Goulart",
+			"email": "rafaelgou@rgou.net",
+			"homepage": "https://mr.rgou.net"
 		}
 	],
 	"type": "library",
@@ -27,11 +27,20 @@
 		"wp-coding-standards/wpcs": "^2",
 		"wp-media/phpunit": "dev-master"
 	},
-	"autoload": {},
-	"autoload-dev": {},
+	"autoload": {
+		"psr-4": {
+			"Rgou\\WPMedia\\": "classes/Rgou/WPMedia"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Rgou\\WPMedia\\Tests\\": "Tests/"
+		}
+	},
 	"scripts": {
-		"test-unit": "\"vendor/bin/wpmedia-phpunit\" unit path=Tests/Unit",
-		"test-integration": "\"vendor/bin/wpmedia-phpunit\" integration path=Tests/Integration/",
+
+		"test-unit":"\"vendor/bin/phpunit\" --testsuite unit --colors=always --configuration Tests/Unit/phpunit.xml.dist",
+		"test-integration": "\"vendor/bin/wpmedia-phpunit\" integration --colors=always path=Tests/Integration/",
 		"run-tests": [
 			"@test-unit",
 			"@test-integration"
