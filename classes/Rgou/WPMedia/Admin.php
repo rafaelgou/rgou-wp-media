@@ -165,7 +165,7 @@ class Admin {
 			delete_option( 'rgou_wp_media' );
 			?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php esc_html_e( 'Error!', 'rgou-wp-media' ); ?> <?php echo  $e->getMessage(); ?></p>
+				<p><?php esc_html_e( 'Error!', 'rgou-wp-media' ); ?> <?php echo esc_html( $e->getMessage() ); ?></p>
 			</div>
 			<?php
 		}
@@ -266,14 +266,19 @@ class Admin {
 	 *
 	 * @param Crawler $crawler The crawler.
 	 * @return void
+	 * @throws \Exception Unable to create file.
 	 */
 	protected static function dump_files( Crawler $crawler ) {
 		$fs = self::get_wp_filesystem_direct();
 		if ( ! $fs->put_contents( get_home_path() . 'index.html', $crawler->get_content( true ), self::get_chmod() ) ) {
-			throw new \Exception( 'Unable to create ' . get_home_path() . 'index.html. Please check root folder permissions.' );
+			// translators:Home path.
+			$msg = sprintf( __( 'Unable to create %s index.html. Please check root folder permissions.', 'rgou-wp-media' ), get_home_path() );
+			throw new \Exception( $msg );
 		};
 		if ( ! $fs->put_contents( get_home_path() . 'sitemap.html', $crawler->get_sitemap(), self::get_chmod() ) ) {
-			throw new \Exception( 'Unable to create ' . get_home_path() . 'sitemap.html. Please check root folder permissions.' );
+			// translators:Home path.
+			$msg = sprintf( __( 'Unable to create %s sitemap.html. Please check root folder permissions.', 'rgou-wp-media' ), get_home_path() );
+			throw new \Exception( $msg );
 		};
 	}
 
@@ -281,14 +286,19 @@ class Admin {
 	 * Dump files using the crawler
 	 *
 	 * @return void
+	 * @throws \Exception Unable to create file.
 	 */
 	protected static function delete_files() {
 		$fs = self::get_wp_filesystem_direct();
 		if ( ! $fs->delete( get_home_path() . 'index.html', self::get_chmod() ) ) {
-			throw new \Exception( 'Unable to remove ' . get_home_path() . 'index.html. Please check root folder permissions.' );
+			// translators:Home path.
+			$msg = sprintf( __( 'Unable to remove %s index.html. Please check root folder permissions.', 'rgou-wp-media' ), get_home_path() );
+			throw new \Exception( $msg );
 		};
 		if ( ! $fs->delete( get_home_path() . 'sitemap.html', self::get_chmod() ) ) {
-			throw new \Exception( 'Unable to remove ' . get_home_path() . 'sitemap.html. Please check root folder permissions.' );
+			// translators:Home path.
+			$msg = sprintf( __( 'Unable to remove %s sitemap.html. Please check root folder permissions.', 'rgou-wp-media' ), get_home_path() );
+			throw new \Exception( $msg );
 		};
 	}
 

@@ -96,7 +96,7 @@ class CrawlerTest extends TestCase
 			$docSitemap  = $crawler->get_dom_document( $sitemap );
 			$nodes = $docSitemap->getElementsByTagName('a');
 
-			$this->assertSame( count( $nodes) , $count );
+			$this->assertSame( $nodes->length , $count );
 
 			foreach ($nodes as $key => $node) {
 				$this->assertSame(
