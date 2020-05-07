@@ -2,7 +2,7 @@
 namespace Rgou\WPMedia;
 
 use DOMDocument;
-use DOMXpath;
+use DOMImplementation;
 
 /**
  * The public-facing functionality of the plugin.
@@ -139,7 +139,11 @@ class Crawler {
 		}
 
 		if ( null === $this->sitemap ) {
-			$doc = new DOMDocument();
+			$doc = ( new \DOMImplementation() )->createDocument(
+				null,
+				'html',
+				( new \DOMImplementation() )->createDocumentType( 'html' )
+			);
 			if ( count( $links ) === 0 ) {
 				return $this->sitemap;
 			}
@@ -168,8 +172,9 @@ class Crawler {
 			$html = $doc->createElement( 'html' );
 			$html->appendChild( $head );
 			$html->appendChild( $body );
+			$doc->appendChild( $html );
 
-			$this->sitemap = $doc->saveHTML( $html );
+			$this->sitemap = $doc->saveHTML( $doc );
 		}
 
 		return $this->sitemap;
