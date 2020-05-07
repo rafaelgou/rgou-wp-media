@@ -21,21 +21,23 @@
 				<?php esc_html_e( 'RGOU Sitemap', 'rgou-wp-media' ); ?>
 			</h1>
 			<hr />
-			<h2><?php esc_html_e( 'See links from your homepage.', 'rgou-wp-media' ); ?></h2>
+			<h2><?php esc_html_e( 'Generate a sitemap for your homepage.', 'rgou-wp-media' ); ?></h2>
 
 			<form action="<?php menu_page_url( 'rgou-wp-admin' ); ?>" method="post">
 
 				<p class="submit">
 					<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Run now', 'rgou-wp-media' ); ?>">
-					<input type="submit" name="disable" id="submit" class="button button-secondary" value="<?php esc_html_e( 'Disable', 'rgou-wp-media' ); ?>">
+					<?php if ( isset( $values ) && array_key_exists( 'timestamp', $values ) && $values['timestamp'] ) : ?>
+						<input type="submit" name="disable" id="submit" class="button button-secondary" value="<?php esc_html_e( 'Disable', 'rgou-wp-media' ); ?>">
+					<?php endif ?>
 				</p>
 				<?php wp_nonce_field( 'rgou_wp_media_option_page_action' ); ?>
 			</form>
 
 			<?php if ( isset( $values ) && array_key_exists( 'timestamp', $values ) && $values['timestamp'] ) : ?>
 				<p>
-					<a href="<?php echo esc_attr( get_site_url() . '/sitemap.html' ); ?>"><?php esc_html_e( 'Sitemap', 'rgou-wp-media' ); ?></a>
-					- <a href="<?php echo esc_attr( get_site_url() . '/index.html' ); ?>"><?php esc_html_e( 'Static homepage', 'rgou-wp-media' ); ?></a>
+					<a href="<?php echo esc_attr( get_site_url() . '/sitemap.html' ); ?>" target="_blank"><?php esc_html_e( 'Sitemap', 'rgou-wp-media' ); ?></a>
+					- <a href="<?php echo esc_attr( get_site_url() . '/index.html' ); ?>" target="_blank"><?php esc_html_e( 'Static homepage', 'rgou-wp-media' ); ?></a>
 				</p>
 
 				<?php if ( isset( $values ) && array_key_exists( 'links', $values ) && $values['links'] && is_array( $values['links'] ) ) : ?>
