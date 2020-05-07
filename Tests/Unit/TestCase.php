@@ -64,12 +64,5 @@ abstract class TestCase extends PHPUnitTestCase {
 		foreach ( $functions as $function ) {
 			Monkey\Functions\when( $function )->echoArg();
 		}
-
-		include_once RGOU_WP_MEDIA_PLUGIN_ROOT . '/Tests/Fixtures/WP/class-wp-error.php';
-
-		Monkey\Functions\when( 'is_wp_error' )
-			->alias( function( $thing ) {
-				return $thing instanceof WP_Error;
-			} );
 	}
 }

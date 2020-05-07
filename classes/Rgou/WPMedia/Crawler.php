@@ -77,46 +77,46 @@ class Crawler {
 	}
 
 	/**
-     * Parse remote content into DomDocument
+	 * Parse remote content into DomDocument
 	 *
-     * @param  string $html_content The html content
-     * @return DOMDocument
-     */
-    public function get_dom_document( $html_content = null)
-    {
-		if ( null === $html_content) {
+	 * @param  string $html_content The html content.
+	 * @return DOMDocument
+	 */
+	public function get_dom_document( $html_content = null ) {
+		if ( null === $html_content ) {
 			$html_content = $this->get_content();
 		}
 
-        $doc = new DOMDocument;
-        libxml_use_internal_errors( true );
+		$doc = new DOMDocument();
+		libxml_use_internal_errors( true );
 		$doc->loadHTML( $html_content );
 
-        return $doc;
-    }
+		return $doc;
+	}
 
 	/**
 	 * Get the links.
 	 *
-	 * @param DOMDocument $doc Dom document
+	 * @param DOMDocument $doc Dom document.
 	 * @return array
 	 */
 	public function get_links( DOMDocument $doc = null ) {
 
-		if ( null === $doc) {
+		if ( null === $doc ) {
 			$doc = $this->get_dom_document();
 		}
 
-		$nodes = $doc->getElementsByTagName('a');
+		$nodes = $doc->getElementsByTagName( 'a' );
 		$links = [];
-        foreach ($nodes as $node) {
-			if ( strpos($node->getAttribute('href'), '#') === 0) {
+		foreach ( $nodes as $node ) {
+			if ( strpos( $node->getAttribute( 'href' ), '#' ) === 0 ) {
 				continue;
 			}
 
 			$links[] = [
-				"href"  => $node->getAttribute('href'),
-				"label" => trim( $node->nodeValue )
+				'href'  => $node->getAttribute( 'href' ),
+				// phpcs:disable
+				'label' => trim( $node->nodeValue ),
 			];
 		}
 
@@ -126,10 +126,10 @@ class Crawler {
 	/**
 	 * Get the sitemap.
 	 *
-	 * @param array $links The links
+	 * @param array $links The links.
 	 * @return string
 	 */
-	public function get_sitemap( $links = null ) {
+	public function get_sitemap ( $links = null ) {
 
 		if ( null === $links) {
 			$links = $this->get_links();
@@ -139,13 +139,13 @@ class Crawler {
 		}
 
 		if ( null === $this->sitemap ) {
-			$doc = new DOMDocument;
+			$doc = new DOMDocument();
 			if ( count( $links ) === 0 ) {
 				return $this->sitemap;
 			}
 
 			$ul = $doc->createElement( 'ul' );
-			foreach( $links as $link ) {
+			foreach ( $links as $link ) {
 				$li = $doc->createElement( 'li' );
 				$a  = $doc->createElement( 'a', $link['label'] );
 				$a->setAttribute( 'href', $link['href'] );
@@ -174,15 +174,4 @@ class Crawler {
 
 		return $this->sitemap;
 	}
-
-	/**
-	 * Run
-	 *
-	 * @return array
-	 */
-	public function run() {
-		$links = $this->get_links();
-
-	}
-
 }

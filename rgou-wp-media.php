@@ -14,7 +14,7 @@
  * @wordpress-plugin
  * Plugin Name:       RGOU WP-Media
  * Plugin URI:        https://github.com/rafaelgou/rgou-wp-media
- * Description:       Homepage Crawler for WP-Media Technical Assessment
+ * Description:       Homepage Crawler and Sitemap generator for WP-Media Technical Assessment
  * Version:           1.0.0
  * Author:            Rafael Goulart
  * Author URI:        https://me.rgou.net
@@ -42,7 +42,7 @@ define( 'RGOU_WP_MEDIA_VERSION', '1.0.0' );
  */
 function rgou_wp_media_activate() {
 	require_once plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Activator.php';
-	Rgou_Wp_Media_Activator::activate();
+	\Rgou\WPMedia\Activator::activate();
 }
 
 /**
@@ -51,7 +51,7 @@ function rgou_wp_media_activate() {
  */
 function rgou_wp_media_deactivate() {
 	require_once plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Deactivator.php';
-	Rgou_Wp_Media_Deactivator::deactivate();
+	\Rgou\WPMedia\Deactivator::deactivate();
 }
 
 register_activation_hook( __FILE__, 'rgou_wp_media_activate' );
@@ -79,7 +79,7 @@ require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Crawler.php';
  */
 function rgou_wp_media_run() {
 
-	$plugin = new Rgou\WPMedia\Plugin();
+	$plugin = new \Rgou\WPMedia\Plugin();
 	$plugin->run();
 
 }
