@@ -1,6 +1,8 @@
 <?php
 namespace Rgou\WPMedia;
 
+use WP_Error;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -74,7 +76,7 @@ class Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rgou-wp-media-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rgou-wp-media-admin.css', [], $this->version, 'all' );
 
 	}
 
@@ -97,7 +99,7 @@ class Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rgou-wp-media-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rgou-wp-media-admin.js', [ 'jquery' ], $this->version, false );
 
 	}
 
@@ -106,14 +108,13 @@ class Admin {
 	 *
 	 * @return void
 	 */
-	public function menu_init() {
-		add_menu_page(
-			'RGOU WP-Media',
-			'RGOU WP-Media',
+	public function settings_init() {
+		add_options_page(
+			'RGOU Sitemap',
+			'RGOU Sitemap',
 			'manage_options',
 			'rgou-wp-media',
-			array( 'Rgou\WPMedia\Admin', 'admin_init' ),
-			'dashicons-yes-alt'
+			[ 'Rgou\WPMedia\Admin', 'admin_init' ]
 		);
 	}
 
@@ -123,32 +124,39 @@ class Admin {
 	 * @return void
 	 */
 	public static function admin_init() {
-		if ( isset( $_POST['config_version'] ) ) {
-			/**
-			 * This is redundant toi avoid direct form exploitation
-			 */
-			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( 'Unauthorized user' );
+		/**
+		 * This is redundant to avoid direct form exploitation
+		 */
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'Unauthorized user' );
+		}
+		if ( isset( $_POST['submit'] ) || isset( $_POST['disable'] ) ) {
+			check_admin_referer( 'rgou_wp_media_option_page_action' );
+
+			if ( isset( $_POST['submit'] ) ) {
+				self::crawler();
+				self::schedule_crawler();
+				?>
+				<div class="notice notice-success is-dismissible">
+					<p><?php esc_html_e( 'Done! Next run in one hour', 'rgou-wp-media' ); ?></p>
+				</div>
+				<?php
+			} elseif ( isset( $_POST['disable'] ) ) {
+				self::disable_crawler();
+				?>
+				<div class="notice notice-success is-dismissible">
+					<p><?php esc_html_e( 'Done! Sitemap disabled', 'rgou-wp-media' ); ?></p>
+				</div>
+				<?php
 			}
-			check_admin_referer( 'wp_oil_cookie_consent_option_page_action' );
-
-			self::store(
-				array (
-
-				)
-			);
 		}
 
 		$values = get_option(
 			'rgou_wp_media',
-			array(
-				'timestamp' => 1,
-				'links'     => array(
-					'https://tech.rgou.com',
-					'https:/me.rgou.net',
-					'https://blog.rgou.com',
-				),
-			)
+			[
+				'timestamp' => wp_next_scheduled( 'rgou_wp_media_crawler' ),
+				'links'     => [],
+			]
 		);
 
 		require_once plugin_dir_path( __FILE__ ) . '../../../admin/partials/rgou-wp-media-admin-display.php';
@@ -159,10 +167,62 @@ class Admin {
 	 *
 	 * @return void
 	 */
-	public function crowler_cron() {
-		$url     = site_url();
-		$crawler = new Crawler( $url );
-		$crawler->run();
+	public static function crawler() {
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+		$url        = get_site_url();
+		$crawler    = new Crawler( $url );
+		$links      = $crawler->get_links();
+		$values     = get_option( 'rgou_wp_media', false );
+		$new_values = [
+			'timestamp' => ( new \DateTime() )->format( 'YmdHis' ),
+			'links'     => $links,
+		];
+
+		if ( $values ) {
+			update_option( 'rgou_wp_media', $new_values );
+		} else {
+			add_option( 'rgou_wp_media', $new_values );
+		}
+
+		$wp_filesystem->put_contents( get_home_path() . '/index.html', $crawler->get_content( true ) );
+		$wp_filesystem->put_contents( get_home_path() . '/sitemap.html', $crawler->get_sitemap() );
+	}
+
+	/**
+	 * Disable crawler
+	 *
+	 * @return void
+	 */
+	public static function disable_crawler() {
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		$values     = get_option( 'rgou_wp_media', false );
+		$new_values = [
+			'timestamp' => false,
+			'links'     => [],
+		];
+
+		if ( $values ) {
+			update_option( 'rgou_wp_media', $new_values );
+		} else {
+			add_option( 'rgou_wp_media', $new_values );
+		}
+
+		if ( wp_next_scheduled( 'rgou_wp_media_crawler' ) ) {
+			$timestamp = wp_next_scheduled( 'rgou_wp_media_crawler' );
+			wp_unschedule_event( $timestamp, 'rgou_wp_media_crawler' );
+		}
+
+		$wp_filesystem->delete( get_home_path() . '/index.html' );
+		$wp_filesystem->delete( get_home_path() . '/sitemap.html' );
 	}
 
 	/**
@@ -170,28 +230,11 @@ class Admin {
 	 *
 	 * @return void
 	 */
-	public function schedule_crawler() {
-		if ( wp_next_scheduled( 'rgou_wp_media_crowler_cron' ) ) {
-			$timestamp = wp_next_scheduled( 'rgou_wp_media_crowler_cron' );
-			wp_unschedule_event( $timestamp, 'rgou_wp_media_crowler_cron' );
+	public static function schedule_crawler() {
+		if ( wp_next_scheduled( 'rgou_wp_media_crawler' ) ) {
+			$timestamp = wp_next_scheduled( 'rgou_wp_media_crawler' );
+			wp_unschedule_event( $timestamp, 'rgou_wp_media_crawler' );
 		}
-		wp_schedule_event( time(), 'hourly', 'rgou_wp_media_crowler_cron' );
-	}
-
-
-	/**
-	 * Store
-	 *
-	 * @param array $posted_data Data sent.
-	 * @return void
-	 */
-	public static function store( $posted_data ) {
-		$values = get_option( 'rgou_wp_media', false );
-
-		if ( $values ) {
-			update_option( 'rgou_wp_media', $posted_data );
-		} else {
-			add_option( 'rgou_wp_media', $posted_data );
-		}
+		wp_schedule_event( time(), 'hourly', 'rgou_wp_media_crawler' );
 	}
 }

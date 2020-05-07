@@ -112,7 +112,8 @@ class Plugin {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'menu_init' );
+		// $this->loader->add_action( 'admin_menu', $plugin_admin, 'menu_init' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'settings_init' );
 		$this->loader->add_action( 'bl_cron_hook', $plugin_admin, 'crowler_cron' );
 	}
 
@@ -129,6 +130,8 @@ class Plugin {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'wp_footer', $plugin_public, 'add_footer', 100 );
+
 	}
 
 	/**

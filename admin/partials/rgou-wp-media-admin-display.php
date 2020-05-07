@@ -13,13 +13,12 @@
 
 ?>
 
-<!-- This file should primarily consist of HTML with a little bit of PHP. -->
 <div id="wpbody" role="main">
 	<div id="wpbody-content">
 		<div class="wrap">
 			<h1 class="wp-heading-inline">
 				<span class="dashicons dashicons-yes-alt"></span>
-				<?php esc_html_e( 'RGOU WP Media', 'rgou-wp-media' ); ?>
+				<?php esc_html_e( 'RGOU Sitemap', 'rgou-wp-media' ); ?>
 			</h1>
 			<hr />
 			<h2><?php esc_html_e( 'See links from your homepage.', 'rgou-wp-media' ); ?></h2>
@@ -28,26 +27,33 @@
 
 				<p class="submit">
 					<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Run now', 'rgou-wp-media' ); ?>">
+					<input type="submit" name="disable" id="submit" class="button button-secondary" value="<?php esc_html_e( 'Disable', 'rgou-wp-media' ); ?>">
 				</p>
-				<?php wp_nonce_field( 'wp_rgou_wp__option_page_action' ); ?>
+				<?php wp_nonce_field( 'rgou_wp_media_option_page_action' ); ?>
 			</form>
 
-			<h2><?php esc_html_e( 'Current values.', 'rgou-wp-media' ); ?></h2>
+			<?php if ( isset( $values ) && array_key_exists( 'timestamp', $values ) && $values['timestamp'] ) : ?>
+				<p>
+					<a href="<?php echo esc_attr( get_site_url() . '/sitemap.html' ); ?>"><?php esc_html_e( 'Sitemap', 'rgou-wp-media' ); ?></a>
+					- <a href="<?php echo esc_attr( get_site_url() . '/index.html' ); ?>"><?php esc_html_e( 'Static homepage', 'rgou-wp-media' ); ?></a>
+				</p>
 
-			<ul>
-				<?php foreach ( $values['links'] as $rgou_wp_media_link ) : ?>
-					<li>
-						<a href="<?php echo esc_attr( $rgou_wp_media_link ); ?>">
-						<?php echo esc_html( $rgou_wp_media_link ); ?>
-					</a>
-				</li>
-				<?php endforeach; ?>
-			</ul>
+				<?php if ( isset( $values ) && array_key_exists( 'links', $values ) && $values['links'] && is_array( $values['links'] ) ) : ?>
+					<h2><?php esc_html_e( 'Current values.', 'rgou-wp-media' ); ?></h2>
 
+					<ul>
+						<?php foreach ( $values['links'] as $rgou_wp_media_link ) : ?>
+							<li>
+								<a href="<?php echo esc_attr( $rgou_wp_media_link['href'] ); ?>">
+								<?php echo esc_html( $rgou_wp_media_link['label'] ); ?>
+							</a>
+						</li>
+						<?php endforeach; ?>
+					</ul>
+				<?php else : ?>
+				<h2><?php esc_html_e( 'No links so far.', 'rgou-wp-media' ); ?></h2>
+				<?php endif ?>
+			<?php endif ?>
 		</div><!-- wrap -->
 	</div><!-- wpbody -->
 </div><!-- wpbody-content -->
-
-<script>
-	console.log(<?php echo wp_json_encode( $values ); ?>);
-</script>

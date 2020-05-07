@@ -31,15 +31,6 @@ class Crawler {
 	private $url;
 
 	/**
-	 * DEOM Document
-	 *
-	 * @since  0.1.0
-	 * @access private
-	 * @var DomDocument $doc The DOM document
-	 */
-	private $doc;
-
-	/**
 	 * The URL content
 	 *
 	 * @since    1.0.0
@@ -72,11 +63,12 @@ class Crawler {
 	 * Get the page content.
 	 *
 	 * @since  1.0.0
+	 * @param boolean $reload Force reload the content
 	 * @return string
 	 */
-	public function get_content() {
+	public function get_content( $force = false ) {
 
-		if ( null === $this->content ) {
+		if ( null === $this->content || $force ) {
 			// phpcs:disable
 			$this->content = file_get_contents( $this->url );
 		}
@@ -87,15 +79,18 @@ class Crawler {
 	/**
      * Parse remote content into DomDocument
 	 *
-     * @param  string $htmlContent
+     * @param  string $html_content The html content
      * @return DOMDocument
      */
-    public function get_dom_document( $htmlContent )
+    public function get_dom_document( $html_content = null)
     {
+		if ( null === $html_content) {
+			$html_content = $this->get_content();
+		}
 
         $doc = new DOMDocument;
         libxml_use_internal_errors( true );
-		$doc->loadHTML( $htmlContent );
+		$doc->loadHTML( $html_content );
 
         return $doc;
     }
@@ -104,17 +99,24 @@ class Crawler {
 	 * Get the links.
 	 *
 	 * @param DOMDocument $doc Dom document
-	 *
-	 * @return links
+	 * @return array
 	 */
-	public function get_links(DOMDocument $doc) {
+	public function get_links( DOMDocument $doc = null ) {
+
+		if ( null === $doc) {
+			$doc = $this->get_dom_document();
+		}
 
 		$nodes = $doc->getElementsByTagName('a');
 		$links = [];
         foreach ($nodes as $node) {
-            $links[] = [
+			if ( strpos($node->getAttribute('href'), '#') === 0) {
+				continue;
+			}
+
+			$links[] = [
 				"href"  => $node->getAttribute('href'),
-				"label" => $node->nodeValue
+				"label" => trim( $node->nodeValue )
 			];
 		}
 
@@ -124,10 +126,14 @@ class Crawler {
 	/**
 	 * Get the sitemap.
 	 *
+	 * @param array $links The links
 	 * @return string
 	 */
-	public function get_sitemap( $links ) {
+	public function get_sitemap( $links = null ) {
 
+		if ( null === $links) {
+			$links = $this->get_links();
+		}
 		if ( ! is_array( $links ) ) {
 			return null;
 		}
@@ -172,9 +178,10 @@ class Crawler {
 	/**
 	 * Run
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function run() {
+		$links = $this->get_links();
 
 	}
 

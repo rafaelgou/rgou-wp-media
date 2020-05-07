@@ -18,8 +18,8 @@ class CrawlerTest extends TestCase
     public function test_get_dom_document()
     {
 		$crawler     = new Crawler('https://www.duckduckgo.com');
-		$htmlContent = $crawler->get_content();
-		$doc         = $crawler->get_dom_document( $htmlContent );
+		$html_content = $crawler->get_content();
+		$doc         = $crawler->get_dom_document( $html_content );
 
         $this->assertTrue($doc instanceof DOMDocument);
     }
@@ -60,10 +60,10 @@ class CrawlerTest extends TestCase
     /**
      * @dataProvider htmlProvider
      */
-	public function test_get_links( $htmlContent, $count, $expectedLinks )
+	public function test_get_links( $html_content, $count, $expectedLinks )
     {
 		$crawler = new Crawler('');
-		$doc     = $crawler->get_dom_document( $htmlContent );
+		$doc     = $crawler->get_dom_document( $html_content );
 		$links   = $crawler->get_links( $doc );
 
         $this->assertSame( count( $links) , $count );
@@ -83,10 +83,10 @@ class CrawlerTest extends TestCase
     /**
      * @dataProvider htmlProvider
      */
-    public function test_get_sitemap( $htmlContent, $count, $expectedLinks )
+    public function test_get_sitemap( $html_content, $count, $expectedLinks )
     {
 		$crawler     = new Crawler('');
-		$doc         = $crawler->get_dom_document( $htmlContent );
+		$doc         = $crawler->get_dom_document( $html_content );
 		$links       = $crawler->get_links( $doc );
 		$sitemap     = $crawler->get_sitemap( $links );
 

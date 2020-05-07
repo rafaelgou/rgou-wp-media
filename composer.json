@@ -40,7 +40,7 @@
 	"scripts": {
 
 		"test-unit":"\"vendor/bin/phpunit\" --testsuite unit --colors=always --configuration Tests/Unit/phpunit.xml.dist",
-		"test-integration": "\"vendor/bin/wpmedia-phpunit\" integration --colors=always path=Tests/Integration/",
+		"test-integration":"\"vendor/bin/phpunit\" --testsuite integration --colors=always --configuration Tests/Integration/phpunit.xml.dist",
 		"run-tests": [
 			"@test-unit",
 			"@test-integration"

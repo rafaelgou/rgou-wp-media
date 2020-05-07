@@ -67,6 +67,7 @@ require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/I18n.php';
 require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Loader.php';
 require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Plugin.php';
 require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/PublicArea.php';
+require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Crawler.php';
 
 /**
  * Begins execution of the plugin.
