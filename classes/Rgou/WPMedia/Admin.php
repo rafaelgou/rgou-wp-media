@@ -168,11 +168,12 @@ class Admin {
 	 * @return void
 	 */
 	public static function crawler() {
-		global $wp_filesystem;
-		if ( empty( $wp_filesystem ) ) {
-			require_once ABSPATH . '/wp-admin/includes/file.php';
-			WP_Filesystem();
-		}
+		$fs = self::get_wp_filesystem_direct();
+		// global $wp_filesystem;
+		// if ( empty( $wp_filesystem ) ) {
+		// 	require_once ABSPATH . '/wp-admin/includes/file.php';
+		// 	WP_Filesystem();
+		// }
 		$url        = get_site_url();
 		$crawler    = new Crawler( $url );
 		$links      = $crawler->get_links();
@@ -188,8 +189,10 @@ class Admin {
 			add_option( 'rgou_wp_media', $new_values );
 		}
 
-		$wp_filesystem->put_contents( get_home_path() . '/index.html', $crawler->get_content( true ) );
-		$wp_filesystem->put_contents( get_home_path() . '/sitemap.html', $crawler->get_sitemap() );
+		$fs->put_contents( get_home_path() . '/index.html', $crawler->get_content( true ), self::get_chmod() );
+		$fs->put_contents( get_home_path() . '/sitemap.html', $crawler->get_sitemap(), self::get_chmod() );
+		// $wp_filesystem->put_contents( get_home_path() . '/index.html', $crawler->get_content( true ) );
+		// $wp_filesystem->put_contents( get_home_path() . '/sitemap.html', $crawler->get_sitemap() );
 	}
 
 	/**
@@ -198,11 +201,13 @@ class Admin {
 	 * @return void
 	 */
 	public static function disable_crawler() {
-		global $wp_filesystem;
-		if ( empty( $wp_filesystem ) ) {
-			require_once ABSPATH . '/wp-admin/includes/file.php';
-			WP_Filesystem();
-		}
+		$fs = self::get_wp_filesystem_direct();
+
+		// global $wp_filesystem;
+		// if ( empty( $wp_filesystem ) ) {
+		// 	require_once ABSPATH . '/wp-admin/includes/file.php';
+		// 	WP_Filesystem();
+		// }
 
 		$values     = get_option( 'rgou_wp_media', false );
 		$new_values = [
@@ -221,8 +226,10 @@ class Admin {
 			wp_unschedule_event( $timestamp, 'rgou_wp_media_crawler' );
 		}
 
-		$wp_filesystem->delete( get_home_path() . '/index.html' );
-		$wp_filesystem->delete( get_home_path() . '/sitemap.html' );
+		$fs->delete( get_home_path() . '/index.html', self::get_chmod() );
+		$fs->delete( get_home_path() . '/sitemap.html', self::get_chmod() );
+		// $wp_filesystem->delete( get_home_path() . '/index.html' );
+		// $wp_filesystem->delete( get_home_path() . '/sitemap.html' );
 	}
 
 	/**
@@ -236,5 +243,29 @@ class Admin {
 			wp_unschedule_event( $timestamp, 'rgou_wp_media_crawler' );
 		}
 		wp_schedule_event( time(), 'hourly', 'rgou_wp_media_crawler' );
+	}
+
+	/**
+	 * Load WP_Filesystem_Direct
+	 *
+	 * @return WP_Filesystem_Direct
+	 */
+	private static function get_wp_filesystem_direct() {
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+		return new \WP_Filesystem_Direct( new \StdClass() );
+	}
+
+	/**
+	 * Get chmod
+	 *
+	 * @return int
+	 */
+	private static function get_chmod() {
+		if ( defined( 'FS_CHMOD_FILE' ) ) {
+			return FS_CHMOD_FILE;
+		}
+
+		return fileperms( ABSPATH . 'index.php' ) & 0777 | 0644;
 	}
 }
