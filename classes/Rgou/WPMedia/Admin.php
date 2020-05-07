@@ -183,9 +183,7 @@ class Admin {
 			add_option( 'rgou_wp_media', $new_values );
 		}
 
-		$fs = self::get_wp_filesystem_direct();
-		$fs->put_contents( get_home_path() . '/index.html', $crawler->get_content( true ), self::get_chmod() );
-		$fs->put_contents( get_home_path() . '/sitemap.html', $crawler->get_sitemap(), self::get_chmod() );
+		self::dump_files( $crawler );
 	}
 
 	/**
@@ -211,9 +209,7 @@ class Admin {
 			wp_unschedule_event( $timestamp, 'rgou_wp_media_crawler' );
 		}
 
-		$fs = self::get_wp_filesystem_direct();
-		$fs->delete( get_home_path() . '/index.html', self::get_chmod() );
-		$fs->delete( get_home_path() . '/sitemap.html', self::get_chmod() );
+		self::delete_files();
 	}
 
 	/**
@@ -234,7 +230,7 @@ class Admin {
 	 *
 	 * @return WP_Filesystem_Direct
 	 */
-	private static function get_wp_filesystem_direct() {
+	protected static function get_wp_filesystem_direct() {
 		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
 		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
 
@@ -246,11 +242,35 @@ class Admin {
 	 *
 	 * @return int
 	 */
-	private static function get_chmod() {
+	protected static function get_chmod() {
 		if ( defined( 'FS_CHMOD_FILE' ) ) {
 			return FS_CHMOD_FILE;
 		}
 
 		return fileperms( ABSPATH . 'index.php' ) & 0777 | 0644;
 	}
+
+	/**
+	 * Dump files using the crawler
+	 *
+	 * @param Crawler $crawler The crawler.
+	 * @return void
+	 */
+	protected static function dump_files( Crawler $crawler ) {
+		$fs = self::get_wp_filesystem_direct();
+		$fs->put_contents( get_home_path() . '/index.html', $crawler->get_content( true ), self::get_chmod() );
+		$fs->put_contents( get_home_path() . '/sitemap.html', $crawler->get_sitemap(), self::get_chmod() );
+	}
+
+	/**
+	 * Dump files using the crawler
+	 *
+	 * @return void
+	 */
+	protected static function delete_files() {
+		$fs = self::get_wp_filesystem_direct();
+		$fs->delete( get_home_path() . '/index.html', self::get_chmod() );
+		$fs->delete( get_home_path() . '/sitemap.html', self::get_chmod() );
+	}
+
 }
