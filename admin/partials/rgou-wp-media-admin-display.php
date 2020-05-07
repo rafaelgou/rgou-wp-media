@@ -27,24 +27,24 @@
 
 				<p class="submit">
 					<input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Run now', 'rgou-wp-media' ); ?>">
-					<?php if ( isset( $values ) && array_key_exists( 'timestamp', $values ) && $values['timestamp'] ) : ?>
+					<?php if ( isset( $rgou_wp_media_values ) && array_key_exists( 'timestamp', $rgou_wp_media_values ) && $rgou_wp_media_values['timestamp'] ) : ?>
 						<input type="submit" name="disable" id="submit" class="button button-secondary" value="<?php esc_html_e( 'Disable', 'rgou-wp-media' ); ?>">
 					<?php endif ?>
 				</p>
 				<?php wp_nonce_field( 'rgou_wp_media_option_page_action' ); ?>
 			</form>
 
-			<?php if ( isset( $values ) && array_key_exists( 'timestamp', $values ) && $values['timestamp'] ) : ?>
+			<?php if ( isset( $rgou_wp_media_values ) && array_key_exists( 'timestamp', $rgou_wp_media_values ) && $rgou_wp_media_values['timestamp'] ) : ?>
 				<p>
 					<a href="<?php echo esc_attr( get_site_url() . '/sitemap.html' ); ?>" target="_blank"><?php esc_html_e( 'Sitemap', 'rgou-wp-media' ); ?></a>
 					- <a href="<?php echo esc_attr( get_site_url() . '/index.html' ); ?>" target="_blank"><?php esc_html_e( 'Static homepage', 'rgou-wp-media' ); ?></a>
 				</p>
 
-				<?php if ( isset( $values ) && array_key_exists( 'links', $values ) && $values['links'] && is_array( $values['links'] ) ) : ?>
+				<?php if ( isset( $rgou_wp_media_values ) && array_key_exists( 'links', $rgou_wp_media_values ) && $rgou_wp_media_values['links'] && is_array( $rgou_wp_media_values['links'] ) ) : ?>
 					<h2><?php esc_html_e( 'Current values.', 'rgou-wp-media' ); ?></h2>
 
 					<ul>
-						<?php foreach ( $values['links'] as $rgou_wp_media_link ) : ?>
+						<?php foreach ( $rgou_wp_media_values['links'] as $rgou_wp_media_link ) : ?>
 							<li>
 								<a href="<?php echo esc_attr( $rgou_wp_media_link['href'] ); ?>">
 								<?php echo esc_html( $rgou_wp_media_link['label'] ); ?>

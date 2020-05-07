@@ -124,40 +124,51 @@ class Admin {
 	 * @return void
 	 */
 	public static function admin_init() {
-		/**
-		 * This is redundant to avoid direct form exploitation
-		 */
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( 'Unauthorized user' );
-		}
-		if ( isset( $_POST['submit'] ) || isset( $_POST['disable'] ) ) {
-			check_admin_referer( 'rgou_wp_media_option_page_action' );
 
-			if ( isset( $_POST['submit'] ) ) {
-				self::crawler();
-				self::schedule_crawler();
-				?>
-				<div class="notice notice-success is-dismissible">
-					<p><?php esc_html_e( 'Done! Next run in one hour', 'rgou-wp-media' ); ?></p>
-				</div>
-				<?php
-			} elseif ( isset( $_POST['disable'] ) ) {
-				self::disable_crawler();
-				?>
-				<div class="notice notice-success is-dismissible">
-					<p><?php esc_html_e( 'Done! Sitemap disabled', 'rgou-wp-media' ); ?></p>
-				</div>
-				<?php
+		try {
+			/**
+			 * This is redundant to avoid direct form exploitation
+			 */
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( 'Unauthorized user' );
 			}
-		}
+			if ( isset( $_POST['submit'] ) || isset( $_POST['disable'] ) ) {
+				check_admin_referer( 'rgou_wp_media_option_page_action' );
 
-		$values = get_option(
-			'rgou_wp_media',
-			[
-				'timestamp' => wp_next_scheduled( 'rgou_wp_media_crawler' ),
-				'links'     => [],
-			]
-		);
+				if ( isset( $_POST['submit'] ) ) {
+					self::crawler();
+					self::schedule_crawler();
+					?>
+					<div class="notice notice-success is-dismissible">
+						<p><?php esc_html_e( 'Done! Next run in one hour', 'rgou-wp-media' ); ?></p>
+					</div>
+					<?php
+				} elseif ( isset( $_POST['disable'] ) ) {
+					self::disable_crawler();
+					?>
+					<div class="notice notice-success is-dismissible">
+						<p><?php esc_html_e( 'Done! Sitemap disabled', 'rgou-wp-media' ); ?></p>
+					</div>
+					<?php
+				}
+			}
+
+			$rgou_wp_media_values = get_option(
+				'rgou_wp_media',
+				[
+					'timestamp' => wp_next_scheduled( 'rgou_wp_media_crawler' ),
+					'links'     => [],
+				]
+			);
+
+		} catch ( \Exception $e ) {
+			delete_option( 'rgou_wp_media' );
+			?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php esc_html_e( 'Error!', 'rgou-wp-media' ); ?> <?php echo  $e->getMessage(); ?></p>
+			</div>
+			<?php
+		}
 
 		require_once plugin_dir_path( __FILE__ ) . '../../../admin/partials/rgou-wp-media-admin-display.php';
 	}
@@ -258,8 +269,12 @@ class Admin {
 	 */
 	protected static function dump_files( Crawler $crawler ) {
 		$fs = self::get_wp_filesystem_direct();
-		$fs->put_contents( get_home_path() . '/index.html', $crawler->get_content( true ), self::get_chmod() );
-		$fs->put_contents( get_home_path() . '/sitemap.html', $crawler->get_sitemap(), self::get_chmod() );
+		if ( ! $fs->put_contents( get_home_path() . 'index.html', $crawler->get_content( true ), self::get_chmod() ) ) {
+			throw new \Exception( 'Unable to create ' . get_home_path() . 'index.html. Please check root folder permissions.' );
+		};
+		if ( ! $fs->put_contents( get_home_path() . 'sitemap.html', $crawler->get_sitemap(), self::get_chmod() ) ) {
+			throw new \Exception( 'Unable to create ' . get_home_path() . 'sitemap.html. Please check root folder permissions.' );
+		};
 	}
 
 	/**
@@ -269,8 +284,12 @@ class Admin {
 	 */
 	protected static function delete_files() {
 		$fs = self::get_wp_filesystem_direct();
-		$fs->delete( get_home_path() . '/index.html', self::get_chmod() );
-		$fs->delete( get_home_path() . '/sitemap.html', self::get_chmod() );
+		if ( ! $fs->delete( get_home_path() . 'index.html', self::get_chmod() ) ) {
+			throw new \Exception( 'Unable to remove ' . get_home_path() . 'index.html. Please check root folder permissions.' );
+		};
+		if ( ! $fs->delete( get_home_path() . 'sitemap.html', self::get_chmod() ) ) {
+			throw new \Exception( 'Unable to remove ' . get_home_path() . 'sitemap.html. Please check root folder permissions.' );
+		};
 	}
 
 }
