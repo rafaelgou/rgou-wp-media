@@ -28,5 +28,11 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	delete_option( 'rgou_wp_media' );
 
+	// phpcs:disable
+	// @todo Remove files
+	// $fs = Rgou\WPMedia\Admin::self::get_wp_filesystem_direct()
+	// $fs->delete( get_home_path() . '/index.html', self::get_chmod() );
+	// $fs->delete( get_home_path() . '/sitemap.html', self::get_chmod() );
+
 	exit;
 }

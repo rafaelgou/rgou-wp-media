@@ -63,12 +63,12 @@ class Crawler {
 	 * Get the page content.
 	 *
 	 * @since  1.0.0
-	 * @param boolean $reload Force reload the content
+	 * @param boolean $reload Force reload the content.
 	 * @return string
 	 */
-	public function get_content( $force = false ) {
+	public function get_content( $reload = false ) {
 
-		if ( null === $this->content || $force ) {
+		if ( null === $this->content || $reload ) {
 			// phpcs:disable
 			$this->content = file_get_contents( $this->url );
 		}
