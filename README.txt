@@ -12,31 +12,29 @@ A simple crawler to create a sitemap for the homepage.
 
 == Description ==
 
-A simple crawler to create a sitemap for the homepage. This is a test for WP-Media position.
+Homepage Crawler and Sitemap generator for WP-Media Technical Assessment
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload `rgou-wp-media.php` to the `/wp-content/plugins/` directory
+1. `cd wp-contents/plugins`
+1. `wget https://github.com/rafaelgou/rgou-wp-media/archive/master.zip`
+1. `unzip master.zip`
+1. `mv rgou-wp-media-master/ rgou-wp-media`
+1. `rm master.zip`
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
 
 == Frequently Asked Questions ==
 
 = What if I have a question =
 
-Got to Github issues
+Got to Github issues at https://github.com/rafaelgou/rgou-wp-media/issues
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+1. Starting admin page
+2. Run successfully
+3. Disabled successfully
+4. Homepage sitemap link
 
 == Changelog ==
 

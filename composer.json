@@ -1,13 +1,13 @@
 {
-	"name": "wp-media/package-template",
+	"name": "rafaelgou/rgou-wp-media",
 	"description": "Repository template for our packages",
-	"homepage": "https://github.com/wp-media/package-template",
+	"homepage": "https://github.com/rafaelgou/rgou-wp-media",
 	"license": "GPL-2.0+",
 	"authors": [
 		{
 			"name": "Rafael Goulart",
 			"email": "rafaelgou@rgou.net",
-			"homepage": "https://mr.rgou.net"
+			"homepage": "https://me.rgou.net"
 		}
 	],
 	"type": "library",
@@ -15,8 +15,8 @@
 		"sort-packages": true
 	},
 	"support": {
-		"issues": "https://github.com/wp-media/package-template/issues",
-		"source": "https://github.com/wp-media/package-template"
+		"issues": "https://github.com/rafaelgou/rgou-wp-media/issues",
+		"source": "https://github.com/rafaelgou/rgou-wp-media"
 	},
 	"require-dev": {
 		"php": "^5.6 || ^7",
