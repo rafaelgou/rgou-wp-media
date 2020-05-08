@@ -4,7 +4,7 @@
 
 This plugin should create and maintain a simple sitemap for the site's homepage, and a static version of it.
 
-A settings page should be created under Dashboard -> Settings, allowing an admin to run the crawling immediatly and schedule to run each hour after that.
+A settings page should be created under Dashboard -> Settings, allowing an admin to run the crawling immediately and schedule to run each hour after that.
 
 ## Deconstructing the problem
 
@@ -39,9 +39,9 @@ The plugin is based on [WP-Media package template](https://github.com/wp-media/p
 },
 ```
 
-The classes are loaded on the main plugin file (`rgou-wp-media.php`),as using the autoload directly can lead to conflicts with other plugins.
+The classes are loaded on the main plugin file (`rgou-wp-media.php`), as using the autoload directly can lead to conflicts with other plugins.
 
-**Second tweak**: Tests were adjusted to use patterns from [imagify-plugin](https://github.com/wp-media/imagify-plugin). This allows to bootstrap integration tests separatedly from unit tests.
+**Second tweak**: Tests were adjusted to use patterns from [imagify-plugin](https://github.com/wp-media/imagify-plugin). This allows to bootstrap integration tests separately from unit tests.
 
 ### Settings page
 
@@ -51,15 +51,15 @@ It also splits for clarity. [`Rgou\WPMedia\Plugin::define_admin_hooks()`](https:
 
 ### Frontend output
 
-Originally the public class was prefixed with the plugin name (an old pattern to avoid name colision). After switching to namespaces, it was renamed to [`Rgou\WPMedia\PublicArea`](https://github.com/rafaelgou/rgou-wp-media/blob/master/classes/Rgou/WPMedia/PublicArea.php#L22). It uses a filter to add a footer when the sitemap is enabled.
+Originally the public class was prefixed with the plugin name (an old pattern to avoid name collision). After switching to namespaces, it was renamed to [`Rgou\WPMedia\PublicArea`](https://github.com/rafaelgou/rgou-wp-media/blob/master/classes/Rgou/WPMedia/PublicArea.php#L22). It uses a filter to add a footer when the sitemap is enabled.
 
 ### The crawler
 
 To make it clear and easier to test, the crawler is a standalone class, without any Wordpress code. This means using `file_get_contents()` instead of `wp_get_remote()`. To be able to unit test many files from `wp-includes` should be added as Fixtures (like [WP_Error on imagify-plugin](https://github.com/wp-media/imagify-plugin/blob/d81c3c2078eceb5c139966e0402f286944d98912/Tests/Unit/TestCase.php#L68)). Or, as an option, use an integration test for that.
 
-The crawler receives an URL, gets the content, extracts the links using [DomDocumnet](https://www.php.net/manual/en/class.domdocument.php), and generates the site map also using [DomDocumnet](https://www.php.net/manual/en/class.domdocument.php). HTML + inline PHP is avoided for consistency. As last functionality, also returns the original content.
+The crawler receives an URL, gets the content, extracts the links using [DomDocumnet](https://www.php.net/manual/en/class.domdocument.php), and generates the site map also using [DomDocumnet](https://www.php.net/manual/en/class.domdocument.php). HTML + inline PHP is avoided for consistency. As the last functionality, it also returns the original content.
 
-The sitemap uses [lit](https://ajusa.github.io/lit/) for a very basic styling.
+The sitemap uses [lit](https://ajusa.github.io/lit/) for very basic styling.
 
 ### Saving links
 
@@ -82,13 +82,13 @@ There are two actions: `submit` and `disable`.
 
 ### Dumping files
 
-A short version of [wp-rocket WP_Filesystem_Direct implementation](https://github.com/wp-media/wp-rocket/blob/adab7a846f85e1edbdeb7e6a63575789d0f0bf7b/inc/functions/files.php#L1142) was used, avoiding needing of `wp-config.php` configuration to force direct access while using `WP_Filesystem`.
+A short version of [wp-rocket WP_Filesystem_Direct implementation](https://github.com/wp-media/wp-rocket/blob/adab7a846f85e1edbdeb7e6a63575789d0f0bf7b/inc/functions/files.php#L1142) was used, without changing any `wp-config.php` configuration to force direct access while using `WP_Filesystem`.
 
 [`Rgou\WPMedia\Admin::dump_files($crawler)`](https://github.com/rafaelgou/rgou-wp-media/blob/master/classes/Rgou/WPMedia/Admin.php#L271) and [`Rgou\WPMedia\Admin::delete_files()`](https://github.com/rafaelgou/rgou-wp-media/blob/master/classes/Rgou/WPMedia/Admin.php#L291) do the tasks checking the return of `WP_Filesystem_Direct::put_contents()` and `WP_Filesystem_Direct::delete()` to throw exceptions (see next).
 
 ### Error handling
 
-The most commmon error is file permission issues while saving. It's expected that the root folder to be writable by the webserver.
+File permission issues while saving are the most common error. It's expected that the root folder to be writable by the webserver.
 
 [`try...catch`](https://github.com/rafaelgou/rgou-wp-media/blob/master/classes/Rgou/WPMedia/Admin.php#L128) is used to intercept any error and display a reasonable message for the admin user. When an error occurs, the `wp_option` is removed.
 
@@ -113,7 +113,7 @@ To keep consistency, `phpcs.xml.dist` was changed to match the plugins' prefixes
     </rule>
 ```
 
-`.code/settings.json` was also twekead to help linting while developing, speeding up coding standards validation:
+`.vscode/settings.json` was also tweaked to help linting while developing, speeding up coding standards validation:
 
 ```javascript
 {
@@ -139,9 +139,9 @@ As the VSCode project includes the whole Wordpress installation, the `phpcs` pat
 
 ### Testing and Travis-CI
 
-Unit and integration tests were implemented. A relaxed [TDD](https://en.wikipedia.org/wiki/Test-driven_development) was used while developing the [Crawler](https://github.com/rafaelgou/rgou-wp-media/blob/master/classes/Rgou/WPMedia/Crawler.php#L22) as very specific actions are easier to develop in such a way.
+Unit and integration tests were implemented. A relaxed [TDD](https://en.wikipedia.org/wiki/Test-driven_development) was used while developing the [Crawler](https://github.com/rafaelgou/rgou-wp-media/blob/master/classes/Rgou/WPMedia/Crawler.php#L22) as very specific actions are easier to develop this way.
 
-Travis-CI integration was pretty straight forward. The only change was the slack channel, pointing to a personal workspace. It was very handy to discover PHP 5.6 issues, in special the [DomNodeList](https://www.php.net/manual/en/class.domnodelist.php) behavior: starting on PHP 7.2 the [Countable interface](https://www.php.net/manual/en/class.countable.php) was implemented, so the item you can use `count()` directly. But that wasn't the earlier behavior, so the code was changed to cover all target versions.
+Travis-CI integration was pretty straight forward. The only change was the slack channel, pointing to a personal workspace. It was very handy to discover PHP 5.6 issues, in special the [DomNodeList](https://www.php.net/manual/en/class.domnodelist.php) behavior: starting on PHP 7.2 the [Countable interface](https://www.php.net/manual/en/class.countable.php) was implemented, so the item you can use `count($node)` function directly. But that wasn't the earlier behavior, so the [test code was changed](https://github.com/rafaelgou/rgou-wp-media/commit/8664eab31010c931c2aedc2e3e2205e40bf44176#diff-ae1c66b5e5b6f4d00c97a1b816e4561eL99) to cover all target versions.
 
 #### Running
 
@@ -162,10 +162,8 @@ To validate the code: `composer phpcs`.
 ## Extras
 
 - Brazilian Portuguese translation was added.
+- Unistall clean up.
 
 ## Clean up
 
 Some unused features from [wppb.me](https://wppb.me/) were removed for the sake of clarity, like enqueueing scripts and styles.
-
-
-
