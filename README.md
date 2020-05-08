@@ -30,7 +30,7 @@ composer install-codestandards
 
 To run tests:
 
-- Uǹit: `composer test-unit`
+- Unit: `composer test-unit`
 - Integration: `composer test-integration`
 - Both: `composer run-tests`
 
