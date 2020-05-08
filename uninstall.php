@@ -26,10 +26,13 @@
 
 // If uninstall not called from WordPress, then exit.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	delete_option( 'rgou_wp_media' );
-
-	require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Admin.php';
-	\Rgou\WPMedia\Admin::delete_files();
-
 	exit;
+}
+
+try {
+	require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Admin.php';
+	require plugin_dir_path( __FILE__ ) . 'classes/Rgou/WPMedia/Uninstall.php';
+	\Rgou\WPMedia\Uninstall::uninstall();
+} catch ( \Exception $e ) {
+	die( esc_html( $e->getMessage() ) );
 }

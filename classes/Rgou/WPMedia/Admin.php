@@ -242,7 +242,7 @@ class Admin {
 	 * @return void
 	 * @throws \Exception Unable to create file.
 	 */
-	protected static function delete_files() {
+	public static function delete_files() {
 		$fs = self::get_wp_filesystem_direct();
 		if ( ! $fs->delete( get_home_path() . 'index.html', self::get_chmod() ) ) {
 			// translators:Home path.
